@@ -441,10 +441,9 @@ public class ResidenceBlockListener implements Listener {
                 continue;
             if (pistonRes != null && blockFrom.isOwner(pistonRes.getOwner()))
                 continue;
-            if (!blockFrom.getPermissions().has(Flags.pistonprotection, FlagCombo.OnlyTrue))
+            if (blockFrom.getPermissions().has(Flags.pistonprotection, FlagCombo.OnlyFalse))
                 continue;
             event.setCancelled(true);
-            break;
         }
     }
 
@@ -468,14 +467,14 @@ public class ResidenceBlockListener implements Listener {
             ClaimedResidence blockFrom = plugin.getResidenceManager().getByLoc(locFrom);
             ClaimedResidence blockTo = plugin.getResidenceManager().getByLoc(locTo);
 
-            if (pistonRes == null && blockTo != null && blockTo.getPermissions().has(Flags.pistonprotection, FlagCombo.OnlyTrue)) {
+            if (pistonRes == null && blockTo != null && blockTo.getPermissions().has(Flags.pistonprotection, true)) {
                 event.setCancelled(true);
                 return;
-            } else if (blockTo != null && blockFrom == null && blockTo.getPermissions().has(Flags.pistonprotection, FlagCombo.OnlyTrue)) {
+            } else if (blockTo != null && blockFrom == null && blockTo.getPermissions().has(Flags.pistonprotection, true)) {
                 event.setCancelled(true);
                 return;
             } else if (blockTo != null && blockFrom != null && (pistonRes != null && !blockTo.isOwner(pistonRes.getOwner()) || !blockTo.isOwner(blockFrom.getOwner()))
-                    && blockTo.getPermissions().has(Flags.pistonprotection, FlagCombo.OnlyTrue)) {
+                    && blockTo.getPermissions().has(Flags.pistonprotection, true)) {
                 event.setCancelled(true);
                 return;
             }

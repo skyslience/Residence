@@ -435,9 +435,9 @@ public class PermissionGroup {
         Residence.getInstance().msg(player, lm.Limits_CanCreate, group.canCreateResidences());
         Residence.getInstance().msg(player, lm.Limits_MaxRes, rPlayer.getMaxRes());
         Residence.getInstance().msg(player, lm.Limits_NumberOwn, rPlayer.getResAmount());
-        Residence.getInstance().msg(player, lm.Limits_MaxEW, group.xmin + "-" + getMaxSize(group , player , group.xmax));
-        Residence.getInstance().msg(player, lm.Limits_MaxNS, group.zmin + "-" + getMaxSize(group , player , group.zmax));
-        Residence.getInstance().msg(player, lm.Limits_MaxUD, group.ymin + "-" + getMaxSize(group , player , group.ymax));
+        Residence.getInstance().msg(player, lm.Limits_MaxEW, group.xmin + "-" + getMaxSize(group , player , group.xmax) + "(" +group.xmax + " + " + getPlayerPermissSize(player.getName()) + " + "+ IsLandAddAPI.getPlayerLandSize((Player) player));
+        Residence.getInstance().msg(player, lm.Limits_MaxNS, group.zmin + "-" + getMaxSize(group , player , group.zmax)+ "(" +group.zmax + " + " + getPlayerPermissSize(player.getName()) + " + "+ IsLandAddAPI.getPlayerLandSize((Player) player));
+        Residence.getInstance().msg(player, lm.Limits_MaxUD, group.ymin + "-" + getMaxSize(group , player , group.ymax)+ "(" +group.ymax + " + " + getPlayerPermissSize(player.getName()) + " + "+ IsLandAddAPI.getPlayerLandSize((Player) player));
         Residence.getInstance().msg(player, lm.Limits_MinMax, group.minHeight, group.maxHeight);
         Residence.getInstance().msg(player, lm.Limits_MaxSubzones, rPlayer.getMaxSubzones());
         Residence.getInstance().msg(player, lm.Limits_MaxSubDepth, rPlayer.getMaxSubzoneDepth());
