@@ -1,27 +1,46 @@
 package com.bekvon.bukkit.residence.listeners;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.bekvon.bukkit.residence.protection.FlagPermissions;
+import com.bekvon.bukkit.residence.protection.FlagPermissions.FlagCombo;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Snowman;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
+import org.bukkit.block.BlockState;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockBurnEvent;
+import org.bukkit.event.block.BlockDispenseEvent;
+import org.bukkit.event.block.BlockFadeEvent;
+import org.bukkit.event.block.BlockFormEvent;
+import org.bukkit.event.block.BlockFromToEvent;
+import org.bukkit.event.block.BlockGrowEvent;
+import org.bukkit.event.block.BlockIgniteEvent;
+import org.bukkit.event.block.BlockIgniteEvent.IgniteCause;
+import org.bukkit.event.block.BlockPhysicsEvent;
+import org.bukkit.event.block.BlockPistonExtendEvent;
+import org.bukkit.event.block.BlockPistonRetractEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
+
 import com.bekvon.bukkit.residence.Residence;
 import com.bekvon.bukkit.residence.containers.Flags;
 import com.bekvon.bukkit.residence.containers.ResidencePlayer;
 import com.bekvon.bukkit.residence.containers.lm;
 import com.bekvon.bukkit.residence.permissions.PermissionGroup;
 import com.bekvon.bukkit.residence.protection.ClaimedResidence;
-import com.bekvon.bukkit.residence.protection.FlagPermissions;
-import com.bekvon.bukkit.residence.protection.FlagPermissions.FlagCombo;
+
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
-import org.bukkit.block.BlockState;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Snowman;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.*;
-import org.bukkit.event.block.BlockIgniteEvent.IgniteCause;
+import org.bukkit.event.block.BlockSpreadEvent;
+import org.bukkit.event.block.EntityBlockFormEvent;
+import org.bukkit.event.block.LeavesDecayEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
@@ -30,14 +49,11 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class ResidenceBlockListener implements Listener {
 
-    public static final String SourceResidenceName = "SourceResidenceName";
     private List<String> MessageInformed = new ArrayList<String>();
     private List<String> ResCreated = new ArrayList<String>();
+
     private Residence plugin;
 
     public ResidenceBlockListener(Residence residence) {
@@ -47,6 +63,9 @@ public class ResidenceBlockListener implements Listener {
     @SuppressWarnings("deprecation")
     @EventHandler(priority = EventPriority.LOWEST)
     public void onAnvilInventoryClick(InventoryClickEvent e) {
+        // Disabling listener if flag disabled globally
+        if (!Flags.anvilbreak.isGlobalyEnabled())
+            return;
         Inventory inv = e.getInventory();
 
         try {
@@ -75,6 +94,9 @@ public class ResidenceBlockListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onPlantGrow(BlockGrowEvent event) {
+        // Disabling listener if flag disabled globally
+        if (!Flags.grow.isGlobalyEnabled())
+            return;
         if (plugin.isDisabledWorldListener(event.getBlock().getWorld()))
             return;
         FlagPermissions perms = plugin.getPermsByLoc(event.getBlock().getLocation());
@@ -85,6 +107,9 @@ public class ResidenceBlockListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onVineGrow(BlockSpreadEvent event) {
+        // Disabling listener if flag disabled globally
+        if (!Flags.grow.isGlobalyEnabled())
+            return;
         if (event.getSource().getType() != Material.VINE)
             return;
         if (plugin.isDisabledWorldListener(event.getBlock().getWorld()))
@@ -97,6 +122,9 @@ public class ResidenceBlockListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onleaveDecay(LeavesDecayEvent event) {
+        // Disabling listener if flag disabled globally
+        if (!Flags.decay.isGlobalyEnabled())
+            return;
         if (plugin.isDisabledWorldListener(event.getBlock().getWorld()))
             return;
         FlagPermissions perms = plugin.getPermsByLoc(event.getBlock().getLocation());
@@ -107,6 +135,9 @@ public class ResidenceBlockListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onTreeGrowt(StructureGrowEvent event) {
+        // Disabling listener if flag disabled globally
+        if (!Flags.grow.isGlobalyEnabled())
+            return;
         if (plugin.isDisabledWorldListener(event.getWorld()))
             return;
         FlagPermissions perms = plugin.getPermsByLoc(event.getLocation());
@@ -181,6 +212,9 @@ public class ResidenceBlockListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onBlockForm(BlockFormEvent event) {
+        // Disabling listener if flag disabled globally
+        if (!Flags.snowtrail.isGlobalyEnabled())
+            return;
         // disabling event on world
         if (plugin.isDisabledWorldListener(event.getBlock().getWorld()))
             return;
@@ -197,6 +231,9 @@ public class ResidenceBlockListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onIceForm(BlockFormEvent event) {
+        // Disabling listener if flag disabled globally
+        if (!Flags.iceform.isGlobalyEnabled())
+            return;
         // disabling event on world
         if (plugin.isDisabledWorldListener(event.getBlock().getWorld()))
             return;
@@ -214,6 +251,9 @@ public class ResidenceBlockListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onIceMelt(BlockFadeEvent event) {
+        // Disabling listener if flag disabled globally
+        if (!Flags.icemelt.isGlobalyEnabled())
+            return;
         // disabling event on world
         if (plugin.isDisabledWorldListener(event.getBlock().getWorld()))
             return;
@@ -228,8 +268,13 @@ public class ResidenceBlockListener implements Listener {
         }
     }
 
+    public static final String SourceResidenceName = "SourceResidenceName";
+
     @EventHandler
     public void onEntityChangeBlock(EntityChangeBlockEvent event) {
+        // Disabling listener if flag disabled globally
+        if (!Flags.fallinprotection.isGlobalyEnabled())
+            return;
         if (event.getEntityType() != EntityType.FALLING_BLOCK)
             return;
         Entity ent = event.getEntity();
@@ -254,6 +299,9 @@ public class ResidenceBlockListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onBlockFall(EntityChangeBlockEvent event) {
+        // Disabling listener if flag disabled globally
+        if (!Flags.fallinprotection.isGlobalyEnabled())
+            return;
         // disabling event on world
         if (plugin.isDisabledWorldListener(event.getBlock().getWorld()))
             return;
@@ -404,6 +452,9 @@ public class ResidenceBlockListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onBlockSpread(BlockSpreadEvent event) {
+        // Disabling listener if flag disabled globally
+        if (!Flags.spread.isGlobalyEnabled())
+            return;
         // disabling event on world
         if (plugin.isDisabledWorldListener(event.getBlock().getWorld()))
             return;
@@ -419,11 +470,20 @@ public class ResidenceBlockListener implements Listener {
         // disabling event on world
         if (plugin.isDisabledWorldListener(event.getBlock().getWorld()))
             return;
+
+        // Disabling listener if flag disabled globally
+        if (!Flags.piston.isGlobalyEnabled())
+            return;
+
         FlagPermissions perms = plugin.getPermsByLoc(event.getBlock().getLocation());
         if (!perms.has(Flags.piston, true)) {
             event.setCancelled(true);
             return;
         }
+
+        // Disabling listener if flag disabled globally
+        if (!Flags.pistonprotection.isGlobalyEnabled())
+            return;
 
         List<Block> blocks = plugin.getNms().getPistonRetractBlocks(event);
 
@@ -441,9 +501,10 @@ public class ResidenceBlockListener implements Listener {
                 continue;
             if (pistonRes != null && blockFrom.isOwner(pistonRes.getOwner()))
                 continue;
-            if (blockFrom.getPermissions().has(Flags.pistonprotection, FlagCombo.OnlyFalse))
+            if (!blockFrom.getPermissions().has(Flags.pistonprotection, FlagCombo.OnlyTrue))
                 continue;
             event.setCancelled(true);
+            break;
         }
     }
 
@@ -452,12 +513,19 @@ public class ResidenceBlockListener implements Listener {
         // disabling event on world
         if (plugin.isDisabledWorldListener(event.getBlock().getWorld()))
             return;
+
+        // Disabling listener if flag disabled globally
+        if (!Flags.piston.isGlobalyEnabled())
+            return;
         FlagPermissions perms = plugin.getPermsByLoc(event.getBlock().getLocation());
         if (!perms.has(Flags.piston, true)) {
             event.setCancelled(true);
             return;
         }
 
+        // Disabling listener if flag disabled globally
+        if (!Flags.pistonprotection.isGlobalyEnabled())
+            return;
         ClaimedResidence pistonRes = plugin.getResidenceManager().getByLoc(event.getBlock().getLocation());
 
         BlockFace dir = event.getDirection();
@@ -467,14 +535,14 @@ public class ResidenceBlockListener implements Listener {
             ClaimedResidence blockFrom = plugin.getResidenceManager().getByLoc(locFrom);
             ClaimedResidence blockTo = plugin.getResidenceManager().getByLoc(locTo);
 
-            if (pistonRes == null && blockTo != null && blockTo.getPermissions().has(Flags.pistonprotection, true)) {
+            if (pistonRes == null && blockTo != null && blockTo.getPermissions().has(Flags.pistonprotection, FlagCombo.OnlyTrue)) {
                 event.setCancelled(true);
                 return;
-            } else if (blockTo != null && blockFrom == null && blockTo.getPermissions().has(Flags.pistonprotection, true)) {
+            } else if (blockTo != null && blockFrom == null && blockTo.getPermissions().has(Flags.pistonprotection, FlagCombo.OnlyTrue)) {
                 event.setCancelled(true);
                 return;
             } else if (blockTo != null && blockFrom != null && (pistonRes != null && !blockTo.isOwner(pistonRes.getOwner()) || !blockTo.isOwner(blockFrom.getOwner()))
-                    && blockTo.getPermissions().has(Flags.pistonprotection, true)) {
+                    && blockTo.getPermissions().has(Flags.pistonprotection, FlagCombo.OnlyTrue)) {
                 event.setCancelled(true);
                 return;
             }
@@ -521,9 +589,12 @@ public class ResidenceBlockListener implements Listener {
         }
     }
 
-    @SuppressWarnings({"deprecation"})
+    @SuppressWarnings({ "deprecation" })
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onLandDryFade(BlockFadeEvent event) {
+        // Disabling listener if flag disabled globally
+        if (!Flags.dryup.isGlobalyEnabled())
+            return;
         // disabling event on world
         if (plugin.isDisabledWorldListener(event.getBlock().getWorld()))
             return;
@@ -543,6 +614,9 @@ public class ResidenceBlockListener implements Listener {
     @SuppressWarnings("deprecation")
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onLandDryPhysics(BlockPhysicsEvent event) {
+        // Disabling listener if flag disabled globally
+        if (!Flags.dryup.isGlobalyEnabled())
+            return;
         // disabling event on world
         if (plugin.isDisabledWorldListener(event.getBlock().getWorld()))
             return;
@@ -629,6 +703,9 @@ public class ResidenceBlockListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onBlockBurn(BlockBurnEvent event) {
+        // Disabling listener if flag disabled globally
+        if (!Flags.firespread.isGlobalyEnabled())
+            return;
         // disabling event on world
         if (plugin.isDisabledWorldListener(event.getBlock().getWorld()))
             return;
@@ -644,10 +721,16 @@ public class ResidenceBlockListener implements Listener {
             return;
         IgniteCause cause = event.getCause();
         if (cause == IgniteCause.SPREAD) {
+            // Disabling listener if flag disabled globally
+            if (!Flags.firespread.isGlobalyEnabled())
+                return;
             FlagPermissions perms = plugin.getPermsByLoc(event.getBlock().getLocation());
             if (!perms.has(Flags.firespread, true))
                 event.setCancelled(true);
         } else if (cause == IgniteCause.FLINT_AND_STEEL) {
+            // Disabling listener if flag disabled globally
+            if (!Flags.ignite.isGlobalyEnabled())
+                return;
             Player player = event.getPlayer();
             FlagPermissions perms = plugin.getPermsByLocForPlayer(event.getBlock().getLocation(), player);
             if (player != null && !perms.playerHas(player, Flags.ignite, true) && !plugin.isResAdminOn(player)) {
@@ -655,6 +738,9 @@ public class ResidenceBlockListener implements Listener {
                 plugin.msg(player, lm.Flag_Deny, Flags.ignite.getName());
             }
         } else {
+            // Disabling listener if flag disabled globally
+            if (!Flags.ignite.isGlobalyEnabled())
+                return;
             FlagPermissions perms = plugin.getPermsByLoc(event.getBlock().getLocation());
             if (!perms.has(Flags.ignite, true)) {
                 event.setCancelled(true);

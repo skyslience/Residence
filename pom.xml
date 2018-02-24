@@ -6,7 +6,7 @@
 
     <groupId>com.bekvon.bukkit.residence</groupId>
     <artifactId>Residence</artifactId>
-    <version>4.7.3.2</version>
+    <version>4.7.6.0</version>
 
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
@@ -130,6 +130,13 @@
             <version>6.1.4-SNAPSHOT</version>
             <scope>system</scope>
             <systemPath>${pom.basedir}/lib/PermissionsBukkit-2.5.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>com.sk89q.WorldEdit</groupId>
+            <artifactId>LuckyPermiss</artifactId>
+            <version>6.1.4-SNAPSHOT</version>
+            <scope>system</scope>
+            <systemPath>${pom.basedir}/lib/LuckPerms-Bukkit-4.1.1.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.sk89q.WorldEdit</groupId>

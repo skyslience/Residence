@@ -59,6 +59,11 @@ public class ResidenceManager implements ResidenceInterface {
         return false;
     }
 
+    public ClaimedResidence getByLoc(Player player) {
+        	return getByLoc(player.getLocation());
+    }
+
+
     @Override
     public ClaimedResidence getByLoc(Location loc) {
         if (loc == null)

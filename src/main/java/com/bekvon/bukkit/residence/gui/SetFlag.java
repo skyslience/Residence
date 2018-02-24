@@ -1,10 +1,13 @@
 package com.bekvon.bukkit.residence.gui;
 
-import com.bekvon.bukkit.residence.Residence;
-import com.bekvon.bukkit.residence.containers.Flags;
-import com.bekvon.bukkit.residence.containers.lm;
-import com.bekvon.bukkit.residence.protection.ClaimedResidence;
-import com.bekvon.bukkit.residence.protection.FlagPermissions.FlagState;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -16,8 +19,11 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.*;
-import java.util.Map.Entry;
+import com.bekvon.bukkit.residence.Residence;
+import com.bekvon.bukkit.residence.containers.Flags;
+import com.bekvon.bukkit.residence.containers.lm;
+import com.bekvon.bukkit.residence.protection.ClaimedResidence;
+import com.bekvon.bukkit.residence.protection.FlagPermissions.FlagState;
 
 public class SetFlag {
 
@@ -39,12 +45,12 @@ public class SetFlag {
         fillFlagDescriptions();
     }
 
-    public boolean isAdmin() {
-        return this.admin;
-    }
-
     public void setAdmin(boolean state) {
         this.admin = state;
+    }
+
+    public boolean isAdmin() {
+        return this.admin;
     }
 
     public void setTargetPlayer(String player) {
@@ -155,6 +161,14 @@ public class SetFlag {
         }
 
         for (Entry<String, Boolean> one : globalFlags.entrySet()) {
+
+            String fname = one.getKey();
+
+            Flags flag = Flags.getFlag(fname);
+
+            if (flag != null && !flag.isGlobalyEnabled())
+                continue;
+
             if (!flags.contains(one.getKey()))
                 continue;
 

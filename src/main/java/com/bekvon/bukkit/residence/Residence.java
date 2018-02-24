@@ -317,26 +317,15 @@ public class Residence extends JavaPlugin {
 
         if (initsuccess) {
             try {
-                saveYml();
-                if (zip != null)
-                    zip.backup();
+                if(getConfigManager().versionCheck()) {
+                    Logger.getLogger("Minecraft").log(Level.SEVERE, "[Residence] 关服保存已经开启 正在保存中.....");
+                    saveYml();
+                    if (zip != null)
+                        zip.backup();
+                }
             } catch (Exception ex) {
                 Logger.getLogger("Minecraft").log(Level.SEVERE, "[Residence] SEVERE SAVE ERROR", ex);
             }
-
-//	    File file = new File(this.getDataFolder(), "uuids.yml");
-//	    YamlConfiguration conf = YamlConfiguration.loadConfiguration(file);
-//	    if (!conf.isConfigurationSection("UUIDS"))
-//		conf.createSection("UUIDS");
-//	    for (Entry<UUID, String> one : getCachedPlayerNameUUIDs().entrySet()) {
-//		conf.set("UUIDS." + one.getKey().toString(), one.getValue());
-//	    }
-//	    try {
-//		conf.save(file);
-//	    } catch (IOException e) {
-//		e.printStackTrace();
-//	    }
-
             Bukkit.getConsoleSender().sendMessage(getPrefix() + " Disabled!");
         }
     }
@@ -406,6 +395,9 @@ public class Residence extends JavaPlugin {
                     }
                 }
             }
+
+            getConfigManager().UpdateFlagFile();
+
             FlagUtilManager = new FlagUtil(this);
             getFlagUtilManager().load();
 

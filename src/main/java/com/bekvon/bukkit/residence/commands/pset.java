@@ -1,20 +1,26 @@
 package com.bekvon.bukkit.residence.commands;
 
-import com.bekvon.bukkit.residence.Residence;
-import com.bekvon.bukkit.residence.containers.*;
-import com.bekvon.bukkit.residence.gui.SetFlag;
-import com.bekvon.bukkit.residence.protection.ClaimedResidence;
+import java.util.Arrays;
+
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.Arrays;
+import com.bekvon.bukkit.residence.Residence;
+import com.bekvon.bukkit.residence.containers.CommandAnnotation;
+import com.bekvon.bukkit.residence.containers.ConfigReader;
+import com.bekvon.bukkit.residence.containers.Flags;
+import com.bekvon.bukkit.residence.containers.cmd;
+import com.bekvon.bukkit.residence.containers.lm;
+import com.bekvon.bukkit.residence.gui.SetFlag;
+import com.bekvon.bukkit.residence.protection.ClaimedResidence;
 
 public class pset implements cmd {
 
     @Override
     @CommandAnnotation(simple = true, priority = 800)
-    public boolean perform(Residence plugin, String[] args, boolean resadmin, Command command, CommandSender sender) {
+    public boolean perform(final Residence plugin, final String[] args, final boolean resadmin, Command command, final CommandSender sender) {
         if (!(sender instanceof Player) && args.length != 5 && args.length == 4 && !args[3].equalsIgnoreCase("removeall"))
             return false;
 
@@ -72,34 +78,45 @@ public class pset implements cmd {
             res.getPermissions().setPlayerFlag(sender, args[2], args[3], args[4], resadmin, true);
             return true;
         } else if ((args.length == 2 || args.length == 3) && plugin.getConfigManager().useFlagGUI()) {
-            Player player = (Player) sender;
-            ClaimedResidence res = null;
-            String targetPlayer = null;
-            if (args.length == 2) {
-                res = plugin.getResidenceManager().getByLoc(player.getLocation());
-                targetPlayer = args[1];
-            } else {
-                res = plugin.getResidenceManager().getByName(args[1]);
-                targetPlayer = args[2];
-            }
 
-            if (res == null) {
-                plugin.msg(sender, lm.Invalid_Residence);
-                return true;
-            }
+            Bukkit.getScheduler().runTaskAsynchronously(plugin, new Runnable() {
+                @Override
+                public void run() {
 
-            if (!plugin.isPlayerExist(player, targetPlayer, true))
-                return false;
-            if (!res.isOwner(player) && !resadmin && !res.getPermissions().playerHas(player, Flags.admin, false)) {
-                plugin.msg(sender, lm.General_NoPermission);
-                return true;
-            }
-            SetFlag flag = new SetFlag(res, player, resadmin);
-            flag.setTargetPlayer(targetPlayer);
-            flag.recalculatePlayer(res);
-            player.closeInventory();
-            plugin.getPlayerListener().getGUImap().put(player.getName(), flag);
-            player.openInventory(flag.getInventory());
+                    Player player = (Player) sender;
+                    ClaimedResidence res = null;
+                    String targetPlayer = null;
+                    if (args.length == 2) {
+                        res = plugin.getResidenceManager().getByLoc(player.getLocation());
+                        targetPlayer = args[1];
+                    } else {
+                        res = plugin.getResidenceManager().getByName(args[1]);
+                        targetPlayer = args[2];
+                    }
+
+                    if (res == null) {
+                        plugin.msg(sender, lm.Invalid_Residence);
+                        return ;
+                    }
+
+                    if (!plugin.isPlayerExist(player, targetPlayer, true)){
+                        plugin.msg(sender, lm.Invalid_Player);
+                        return;
+                    }
+                    if (!res.isOwner(player) && !resadmin && !res.getPermissions().playerHas(player, Flags.admin, false)) {
+                        plugin.msg(sender, lm.General_NoPermission);
+                        return ;
+                    }
+                    SetFlag flag = new SetFlag(res, player, resadmin);
+                    flag.setTargetPlayer(targetPlayer);
+                    flag.recalculatePlayer(res);
+                    player.closeInventory();
+                    plugin.getPlayerListener().getGUImap().put(player.getName(), flag);
+                    player.openInventory(flag.getInventory());
+                    return;
+                }
+            });
+
 
             return true;
         }

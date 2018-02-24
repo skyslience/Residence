@@ -35,7 +35,7 @@ public class ZipLibrary {
 	}
     }
 
-    public void backup() throws IOException {
+    public synchronized void backup() throws IOException {
 	if (!BackupDir.isDirectory())
 	    try {
 		BackupDir.mkdir();

@@ -117,6 +117,11 @@ public enum Flags {
     private FlagMode flagMode;
     private String desc;
     private boolean enabled;
+    private boolean globalyEnabled = true;
+
+    public static enum FlagMode {
+        Player, Residence, Both, Group
+    }
 
     private Flags(int id, int data, FlagMode flagMode, String desc, boolean enabled) {
         this.id = id;
@@ -124,14 +129,6 @@ public enum Flags {
         this.flagMode = flagMode;
         this.desc = desc;
         this.enabled = enabled;
-    }
-
-    public static Flags getFlag(String flag) {
-        for (Flags f : Flags.values()) {
-            if (f.getName().equalsIgnoreCase(flag))
-                return f;
-        }
-        return null;
     }
 
     public int getId() {
@@ -159,14 +156,26 @@ public enum Flags {
     }
 
     public boolean isEnabled() {
-        return enabled;
+        return globalyEnabled ? enabled : false;
     }
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
     }
 
-    public static enum FlagMode {
-        Player, Residence, Both, Group
+    public static Flags getFlag(String flag) {
+        for (Flags f : Flags.values()) {
+            if (f.getName().equalsIgnoreCase(flag))
+                return f;
+        }
+        return null;
+    }
+
+    public boolean isGlobalyEnabled() {
+        return globalyEnabled;
+    }
+
+    public void setGlobalyEnabled(boolean globalyEnabled) {
+        this.globalyEnabled = globalyEnabled;
     }
 }

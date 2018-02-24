@@ -76,7 +76,7 @@ public class ResidenceBank {
         }
         if (sender instanceof Player && Residence.getInstance().getEconomyManager().add(sender.getName(), amount) || !(sender instanceof Player)) {
             this.subtract(amount);
-            Residence.getInstance().msg(sender, lm.Bank_Withdraw, String.format("%d", amount));
+            Residence.getInstance().msg(sender, lm.Bank_Withdraw, String.format("%.2f", amount));
         }
     }
 

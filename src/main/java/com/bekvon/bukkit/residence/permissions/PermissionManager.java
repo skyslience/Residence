@@ -110,6 +110,12 @@ public class PermissionManager {
             Bukkit.getConsoleSender().sendMessage(plugin.getPrefix() + " Found bPermissions Plugin!");
             return;
         }
+        p = server.getPluginManager().getPlugin("LuckPerms");
+        if (p != null) {
+            perms = new LuckPerms4Adapter();
+            Bukkit.getConsoleSender().sendMessage(plugin.getPrefix() + " Found LuckPerms Plugin!");
+            return;
+        }
         p = server.getPluginManager().getPlugin("Permissions");
         Bukkit.getConsoleSender().sendMessage(plugin.getPrefix() + " Permissions plugin NOT FOUND!");
     }

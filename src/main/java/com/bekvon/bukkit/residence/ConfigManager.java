@@ -1,43 +1,39 @@
 package com.bekvon.bukkit.residence;
 
-import com.bekvon.bukkit.residence.containers.ConfigReader;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Effect;
+import org.bukkit.Location;
+
 import com.bekvon.bukkit.residence.containers.Flags;
+import com.bekvon.bukkit.residence.containers.ConfigReader;
 import com.bekvon.bukkit.residence.containers.RandomTeleport;
 import com.bekvon.bukkit.residence.protection.FlagPermissions;
 import com.bekvon.bukkit.residence.utils.ParticleEffects;
-import org.bukkit.*;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
 
-import java.io.*;
-import java.util.*;
-
 public class ConfigManager {
-    // DynMap
-    public boolean DynMapUse;
-    public boolean DynMapShowFlags;
-    public boolean DynMapHideHidden;
-    public boolean DynMapLayer3dRegions;
-    public int DynMapLayerSubZoneDepth;
-    public String DynMapBorderColor;
-    public double DynMapBorderOpacity;
-    public int DynMapBorderWeight;
-    public String DynMapFillColor;
-    public double DynMapFillOpacity;
-    public String DynMapFillForRent;
-    public String DynMapFillRented;
-    public String DynMapFillForSale;
-    public List<String> DynMapVisibleRegions;
-    public List<String> DynMapHiddenRegions;
-    // Schematics
-    public boolean RestoreAfterRentEnds;
-    public boolean SchematicsSaveOnFlagChange;
-    // Global chat
-    public boolean GlobalChatEnabled;
-    public boolean GlobalChatSelfModify;
-    public String GlobalChatFormat;
     protected String defaultGroup;
     protected boolean useLeases;
     protected boolean ResMoneyBack;
@@ -83,6 +79,12 @@ public class ConfigManager {
     protected int leaseCheckInterval;
     protected int autoSaveInt;
     protected boolean NewSaveMechanic;
+    private int ItemPickUpDelay;
+    private boolean AutomaticResidenceCreationCheckCollision;
+    private String AutomaticResidenceCreationIncrementFormat;
+
+    private boolean ConsoleLogsShowFlagChanges = true;
+
     // Backup stuff
     protected boolean BackupAutoCleanUpUse;
     protected int BackupAutoCleanUpDays;
@@ -95,6 +97,7 @@ public class ConfigManager {
     protected boolean BackupflagsFile;
     protected boolean BackupgroupsFile;
     protected boolean BackupconfigFile;
+
     protected int FlowLevel;
     protected int PlaceLevel;
     protected int BlockFallLevel;
@@ -109,6 +112,9 @@ public class ConfigManager {
     protected boolean TeleportTitleMessage;
     protected int VisualizerRowSpacing;
     protected int VisualizerCollumnSpacing;
+    protected int VisualizerSkipBy;
+    private int VisualizerFrameCap;
+    private int VisualizerSidesCap;
     protected boolean flagsInherit;
     protected ChatColor chatColor;
     protected boolean chatEnable;
@@ -143,13 +149,6 @@ public class ConfigManager {
     protected boolean NewPlayerFree;
     protected boolean spoutEnable;
     protected boolean AutoMobRemoval;
-
-    //Town
-//    private boolean TownEnabled = false;
-//    private int TownMinRange = 0;
-
-//    protected boolean DisableNoFlagMessageUse;
-//    protected List<String> DisableNoFlagMessageWorlds = new ArrayList<String>();
     protected boolean BounceAnimation;
     protected boolean useFlagGUI;
     protected int AutoMobRemovalInterval;
@@ -160,10 +159,19 @@ public class ConfigManager {
     protected boolean UUIDConvertion = true;
     protected boolean OfflineMode = false;
     protected boolean SelectionIgnoreY = false;
+    protected boolean SelectionIgnoreYInSubzone = false;
     protected boolean NoCostForYBlocks = false;
     protected boolean useVisualizer;
     protected boolean DisableListeners;
     protected boolean DisableCommands;
+
+    //Town
+//    private boolean TownEnabled = false;
+//    private int TownMinRange = 0;
+
+//    protected boolean DisableNoFlagMessageUse;
+//    protected List<String> DisableNoFlagMessageWorlds = new ArrayList<String>();
+
     protected boolean TNTExplodeBelow;
     protected int TNTExplodeBelowLevel;
     protected boolean CreeperExplodeBelow;
@@ -180,35 +188,66 @@ public class ConfigManager {
     protected List<String> FlagsList;
     protected List<String> NegativePotionEffects;
     protected List<String> NegativeLingeringPotionEffects;
+    private Double WalkSpeed1;
+    private Double WalkSpeed2;
+
     protected Location KickLocation;
     protected Location FlyLandLocation;
+
     protected List<RandomTeleport> RTeleport = new ArrayList<RandomTeleport>();
+
     protected List<String> DisabledWorldsList = new ArrayList<String>();
+
     protected int rtCooldown;
     protected int rtMaxTries;
+
     protected ItemStack GuiTrue;
     protected ItemStack GuiFalse;
     protected ItemStack GuiRemove;
+
+    private boolean enforceAreaInsideArea;
+
     protected ParticleEffects SelectedFrame;
     protected ParticleEffects SelectedSides;
+
     protected ParticleEffects OverlapFrame;
     protected ParticleEffects OverlapSides;
+
     protected Effect SelectedSpigotFrame;
     protected Effect SelectedSpigotSides;
+
     protected Effect OverlapSpigotFrame;
     protected Effect OverlapSpigotSides;
-    private int ItemPickUpDelay;
-    private boolean AutomaticResidenceCreationCheckCollision;
-    private String AutomaticResidenceCreationIncrementFormat;
-    private boolean ConsoleLogsShowFlagChanges = true;
+
     // DynMap
-    private int VisualizerFrameCap;
-    private int VisualizerSidesCap;
+    public boolean DynMapUse;
+    public boolean DynMapShowFlags;
+    public boolean DynMapHideHidden;
+    public boolean DynMapLayer3dRegions;
+    public int DynMapLayerSubZoneDepth;
+    public String DynMapBorderColor;
+    public double DynMapBorderOpacity;
+    public int DynMapBorderWeight;
+    public String DynMapFillColor;
+    public double DynMapFillOpacity;
+    public String DynMapFillForRent;
+    public String DynMapFillRented;
+    public String DynMapFillForSale;
+    public List<String> DynMapVisibleRegions;
+    public List<String> DynMapHiddenRegions;
+    // DynMap
+
     // Schematics
-    private Double WalkSpeed1;
-    private Double WalkSpeed2;
-    private boolean enforceAreaInsideArea;
+    public boolean RestoreAfterRentEnds;
+    public boolean SchematicsSaveOnFlagChange;
+    // Schematics
+
     // Global chat
+    public boolean GlobalChatEnabled;
+    public boolean GlobalChatSelfModify;
+    public String GlobalChatFormat;
+    // Global chat
+
     private Residence plugin;
 
     public ConfigManager(Residence plugin) {
@@ -223,16 +262,6 @@ public class ConfigManager {
 
     public static String Colors(String text) {
         return ChatColor.translateAlternateColorCodes('&', text);
-    }
-
-    public static List<String> ColorsArray(List<String> text, Boolean colorize) {
-        List<String> temp = new ArrayList<String>();
-        for (String part : text) {
-            if (colorize)
-                part = Colors(part);
-            temp.add(Colors(part));
-        }
-        return temp;
     }
 
     public void ChangeConfig(String path, Boolean stage) {
@@ -253,10 +282,26 @@ public class ConfigManager {
         plugin.getConfigManager().UpdateConfigFile();
     }
 
+    public static List<String> ColorsArray(List<String> text, Boolean colorize) {
+        List<String> temp = new ArrayList<String>();
+        for (String part : text) {
+            if (colorize)
+                part = Colors(part);
+            temp.add(Colors(part));
+        }
+        return temp;
+    }
+
     void UpdateFlagFile() {
 
         File f = new File(plugin.getDataFolder(), "flags.yml");
         YamlConfiguration conf = YamlConfiguration.loadConfiguration(f);
+
+//	if (!conf.isConfigurationSection("Global.CompleteDisable"))
+//	    conf.crea.createSection("Global.CompleteDisable");
+
+        if (!conf.isList("Global.TotalFlagDisabling"))
+            conf.set("Global.TotalFlagDisabling", Arrays.asList("Completely", "Disabled", "Particular", "Flags"));
 
         for (Flags fl : Flags.values()) {
             if (conf.isBoolean("Global.FlagPermission." + fl.getName()))
@@ -271,8 +316,19 @@ public class ConfigManager {
         ConfigurationSection guiSection = conf.getConfigurationSection("Global.FlagGui");
 
         for (Flags fl : Flags.values()) {
-            guiSection.set(fl.getName() + ".Id", fl.getId());
-            guiSection.set(fl.getName() + ".Data", fl.getData());
+            if (guiSection.isInt(fl.getName() + ".Id") && guiSection.isInt(fl.getName() + ".Data")) {
+
+                String data = "";
+                if (guiSection.getInt(fl.getName() + ".Data") != 0)
+                    data = "-" + guiSection.getInt(fl.getName() + ".Data");
+
+                guiSection.set(fl.getName(), guiSection.getInt(fl.getName() + ".Id") + data);
+            } else {
+                String data = "";
+                if (fl.getData() != 0)
+                    data = "-" + guiSection.getInt(fl.getName() + ".Data");
+                guiSection.set(fl.getName(), fl.getId() + data);
+            }
         }
 
         try {
@@ -374,6 +430,12 @@ public class ConfigManager {
 
         c.getW().addComment("Global.Selection.IgnoreY", "By setting this to true, all selections will be made from bedrock to sky ignoring Y coordinates");
         SelectionIgnoreY = c.get("Global.Selection.IgnoreY", false);
+
+        c.getW().addComment("Global.Selection.IgnoreYInSubzone",
+                "When this set to true, selections inside existing residence will be from bottom to top of that residence",
+                "When this set to false, selections inside existing residence will be exactly as they are");
+        SelectionIgnoreYInSubzone = c.get("Global.Selection.IgnoreYInSubzone", false);
+
         c.getW().addComment("Global.Selection.NoCostForYBlocks", "By setting this to true, player will only pay for x*z blocks ignoring height",
                 "This will lower residence price by up to 256 times, so adjust block price BEFORE enabling this");
         NoCostForYBlocks = c.get("Global.Selection.NoCostForYBlocks", false);
@@ -855,8 +917,8 @@ public class ConfigManager {
         VisualizerRange = c.get("Global.Visualizer.Range", 16);
         c.getW().addComment("Global.Visualizer.ShowFor", "For how long in miliseconds (5000 = 5sec) to show particle effects");
         VisualizerShowFor = c.get("Global.Visualizer.ShowFor", 5000);
-        c.getW().addComment("Global.Visualizer.updateInterval", "How often in miliseconds update particles for player");
-        VisualizerUpdateInterval = c.get("Global.Visualizer.updateInterval", 20);
+        c.getW().addComment("Global.Visualizer.updateInterval", "How often in ticks to update particles for player");
+        VisualizerUpdateInterval = c.get("Global.Visualizer.updateInterval", 5);
         c.getW().addComment("Global.Visualizer.RowSpacing", "Spacing in blocks between particle effects for rows");
         VisualizerRowSpacing = c.get("Global.Visualizer.RowSpacing", 2);
         if (VisualizerRowSpacing < 1)
@@ -866,8 +928,16 @@ public class ConfigManager {
         if (VisualizerCollumnSpacing < 1)
             VisualizerCollumnSpacing = 1;
 
+        c.getW().addComment("Global.Visualizer.SkipBy",
+                "Defines by how many particles we need to skip",
+                "This will create moving particle effect and will improve overall look of selection",
+                "By increasing this number, you can decrease update interval");
+        VisualizerSkipBy = c.get("Global.Visualizer.SkipBy", 5);
+        if (VisualizerSkipBy < 1)
+            VisualizerSkipBy = 1;
+
         c.getW().addComment("Global.Visualizer.FrameCap", "Maximum amount of frame particles to show for one player");
-        VisualizerFrameCap = c.get("Global.Visualizer.FrameCap", 2000);
+        VisualizerFrameCap = c.get("Global.Visualizer.FrameCap", 500);
         if (VisualizerFrameCap < 1)
             VisualizerFrameCap = 1;
 
@@ -1082,6 +1152,18 @@ public class ConfigManager {
 
     public void loadFlags() {
         FileConfiguration flags = YamlConfiguration.loadConfiguration(new File(plugin.dataFolder, "flags.yml"));
+
+        if (flags.isList("Global.TotalFlagDisabling")) {
+            List<String> globalDisable = flags.getStringList("Global.TotalFlagDisabling");
+
+            for (String fl : globalDisable) {
+                Flags flag = Flags.getFlag(fl);
+                if (flag == null)
+                    continue;
+                flag.setGlobalyEnabled(false);
+            }
+        }
+
         globalCreatorDefaults = FlagPermissions.parseFromConfigNode("CreatorDefault", flags.getConfigurationSection("Global"));
         globalResidenceDefaults = FlagPermissions.parseFromConfigNode("ResidenceDefault", flags.getConfigurationSection("Global"));
         loadGroups();
@@ -1203,6 +1285,10 @@ public class ConfigManager {
 
     public int getVisualizerCollumnSpacing() {
         return VisualizerCollumnSpacing;
+    }
+
+    public int getVisualizerSkipBy() {
+        return VisualizerSkipBy;
     }
 
     public int getVisualizerUpdateInterval() {
@@ -1401,7 +1487,7 @@ public class ConfigManager {
         return NewSaveMechanic;
     }
 
-    // backup stuff   
+    // backup stuff
     public boolean BackupAutoCleanUpUse() {
         return BackupAutoCleanUpUse;
     }
@@ -1605,6 +1691,10 @@ public class ConfigManager {
 
     public boolean isSelectionIgnoreY() {
         return SelectionIgnoreY;
+    }
+
+    public boolean isSelectionIgnoreYInSubzone() {
+        return SelectionIgnoreYInSubzone;
     }
 
     public boolean isNoCostForYBlocks() {

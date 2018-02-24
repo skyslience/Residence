@@ -1,14 +1,15 @@
 package com.bekvon.bukkit.residence.containers;
 
-import com.bekvon.bukkit.residence.protection.ClaimedResidence;
-import com.bekvon.bukkit.residence.protection.CuboidArea;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import com.bekvon.bukkit.residence.protection.ClaimedResidence;
+import com.bekvon.bukkit.residence.protection.CuboidArea;
 
 public class Visualizer {
     private Player player;
@@ -17,8 +18,10 @@ public class Visualizer {
     private List<CuboidArea> errorAreas = new ArrayList<CuboidArea>();
     private int id = -1;
     private int errorId = -1;
+    private int baseShedId = -1;
     private boolean once = false;
     private int starting = 0;
+    private int currentSkip = 0;
 
     private List<Location> locations = new ArrayList<Location>();
     private List<Location> errorLocations = new ArrayList<Location>();
@@ -37,6 +40,9 @@ public class Visualizer {
         }
         if (errorId != -1) {
             Bukkit.getScheduler().cancelTask(errorId);
+        }
+        if (baseShedId != -1) {
+            Bukkit.getScheduler().cancelTask(baseShedId);
         }
     }
 
@@ -73,11 +79,6 @@ public class Visualizer {
         return areas;
     }
 
-    public void setAreas(CuboidArea area) {
-        areas = new ArrayList<CuboidArea>();
-        this.areas.add(area);
-    }
-
     public void setAreas(ClaimedResidence res) {
         if (res != null)
             this.areas = Arrays.asList(res.getAreaArray());
@@ -91,12 +92,13 @@ public class Visualizer {
         this.areas = areas;
     }
 
-    public List<CuboidArea> getErrorAreas() {
-        return errorAreas;
+    public void setAreas(CuboidArea area) {
+        areas = new ArrayList<CuboidArea>();
+        this.areas.add(area);
     }
 
-    public void setErrorAreas(CuboidArea errorArea) {
-        this.errorAreas.add(errorArea);
+    public List<CuboidArea> getErrorAreas() {
+        return errorAreas;
     }
 
     public void setErrorAreas(ClaimedResidence res) {
@@ -110,6 +112,10 @@ public class Visualizer {
 
     public void setErrorAreas(ArrayList<CuboidArea> errorAreas) {
         this.errorAreas = errorAreas;
+    }
+
+    public void setErrorAreas(CuboidArea errorArea) {
+        this.errorAreas.add(errorArea);
     }
 
     public int getId() {
@@ -182,5 +188,25 @@ public class Visualizer {
 
     public void setStarting(int starting) {
         this.starting = starting;
+    }
+
+    public int getBaseShedId() {
+        return baseShedId;
+    }
+
+    public void setBaseShedId(int baseShedId) {
+        this.baseShedId = baseShedId;
+    }
+
+    public int getCurrentSkip() {
+        return currentSkip;
+    }
+
+    public void setCurrentSkip(int currentSkip) {
+        this.currentSkip = currentSkip;
+    }
+
+    public void addCurrentSkip() {
+        this.currentSkip++;
     }
 }

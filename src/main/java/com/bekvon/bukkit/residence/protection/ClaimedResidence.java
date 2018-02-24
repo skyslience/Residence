@@ -1476,11 +1476,13 @@ public class ClaimedResidence {
         if (!tpevent.isCancelled()) {
             targetPlayer.closeInventory();
             targetPlayer.teleport(targloc);
-            if (near)
-                plugin.msg(targetPlayer, lm.Residence_TeleportNear);
-            else
-                plugin.msg(targetPlayer, lm.General_TeleportSuccess);
-
+            boolean teleported = targetPlayer.teleport(targloc);
+            if(teleported){
+                if (near)
+                    plugin.msg(targetPlayer, lm.Residence_TeleportNear);
+                else
+                    plugin.msg(targetPlayer, lm.General_TeleportSuccess);
+            }
         }
     }
 
