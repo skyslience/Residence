@@ -1009,6 +1009,7 @@ public class Residence extends JavaPlugin {
                 File backupFile = new File(backupFolder, "res_" + entry.getKey() + ".yml");
                 if (backupFile.isFile()) {
                     backupFile.delete();
+                    System.out.println("111111111111111");
                 }
                 ymlSaveLoc.renameTo(backupFile);
             }
